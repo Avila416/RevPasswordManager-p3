@@ -1,0 +1,50 @@
+# Security Service Configuration (Keerthana)
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:securitydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+password:
+  generator:
+    default-length: 16
+    include-uppercase: true
+    include-lowercase: true
+    include-numbers: true
+    include-special: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      vaultService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+      authService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+  retry:
+    instances:
+      vaultService:
+        max-attempts: 3
+        wait-duration: 1s

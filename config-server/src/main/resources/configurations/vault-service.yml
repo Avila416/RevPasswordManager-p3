@@ -1,0 +1,40 @@
+# Vault Service Configuration (Avila)
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:vaultdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+encryption:
+  secret-key: VaultEncryptionSecretKey12345678
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+  retry:
+    instances:
+      authService:
+        max-attempts: 3
+        wait-duration: 1s

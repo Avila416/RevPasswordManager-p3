@@ -1,0 +1,104 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Auth Service Routes (Namratha)
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**, /api/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: authServiceCircuitBreaker
+                fallbackUri: forward:/fallback/auth
+
+        # Vault Service Routes (Avila)
+        - id: vault-service
+          uri: lb://vault-service
+          predicates:
+            - Path=/api/vault/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: vaultServiceCircuitBreaker
+                fallbackUri: forward:/fallback/vault
+
+        # Security Service Routes (Keerthana)
+        - id: security-service
+          uri: lb://security-service
+          predicates:
+            - Path=/api/generator/**, /api/security/**, /api/dashboard/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: securityServiceCircuitBreaker
+                fallbackUri: forward:/fallback/security
+
+        # Backup Service Routes (Akhila)
+        - id: backup-service
+          uri: lb://backup-service
+          predicates:
+            - Path=/api/backup/**, /api/audit/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: backupServiceCircuitBreaker
+                fallbackUri: forward:/fallback/backup
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+              - "chrome-extension://*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authServiceCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      vaultServiceCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      securityServiceCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+      backupServiceCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+  timelimiter:
+    instances:
+      authServiceCircuitBreaker:
+        timeout-duration: 3s
+      vaultServiceCircuitBreaker:
+        timeout-duration: 3s
+      securityServiceCircuitBreaker:
+        timeout-duration: 5s
+      backupServiceCircuitBreaker:
+        timeout-duration: 10s
