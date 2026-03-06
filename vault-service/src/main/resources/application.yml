@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: vault-service
+  config:
+    import: optional:configserver:http://configuser:configpass@localhost:8888

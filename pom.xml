@@ -22,7 +22,7 @@
         <module>config-server</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
-        <module>backup-service</module>
+        <module>vault-service</module>
     </modules>
 
     <properties>
