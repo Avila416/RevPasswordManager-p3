@@ -51,58 +51,6 @@ services:
     networks:
       - password-manager-network
 
-  # Auth Service (Namratha)
-  auth-service:
-    build: ./auth-service
-    container_name: auth-service
-    ports:
-      - "8081:8081"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-    networks:
-      - password-manager-network
-
-  # Vault Service (Avila)
-  vault-service:
-    build: ./vault-service
-    container_name: vault-service
-    ports:
-      - "8082:8082"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      auth-service:
-        condition: service_started
-    networks:
-      - password-manager-network
-
-  # Security Service (Keerthana)
-  security-service:
-    build: ./security-service
-    container_name: security-service
-    ports:
-      - "8083:8083"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      vault-service:
-        condition: service_started
-    networks:
-      - password-manager-network
-
   # Backup Service (Akhila)
   backup-service:
     build: ./backup-service
@@ -116,8 +64,6 @@ services:
     depends_on:
       discovery-server:
         condition: service_healthy
-      vault-service:
-        condition: service_started
     networks:
       - password-manager-network
 
