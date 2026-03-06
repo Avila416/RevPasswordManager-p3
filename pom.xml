@@ -22,10 +22,10 @@
         <module>config-server</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
-        <module>auth-service</module>
-        <module>vault-service</module>
+        <!-- <module>auth-service</module> -->
+        <!-- <module>vault-service</module>
         <module>security-service</module>
-        <module>backup-service</module>
+        <module>backup-service</module> -->
     </modules>
 
     <properties>
