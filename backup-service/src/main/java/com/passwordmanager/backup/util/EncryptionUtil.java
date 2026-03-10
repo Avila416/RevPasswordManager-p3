@@ -17,7 +17,7 @@ public class EncryptionUtil {
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
 
-    @Value("${backup.encryption-key:BackupEncryptionSecretKey12345678}")
+    @Value("${backup.encryption-key:BackupEncryptionSecretKey1234567}")
     private String encryptionKey;
 
     public String encrypt(String plainText) {

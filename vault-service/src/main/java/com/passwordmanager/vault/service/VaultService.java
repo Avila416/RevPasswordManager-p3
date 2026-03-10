@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +49,9 @@ public class VaultService {
     @Transactional
     public PasswordEntryResponse createEntry(Long userId, PasswordEntryRequest request) {
         validateUser(userId);
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new BadRequestException("Password is required");
+        }
 
         PasswordEntry entry = PasswordEntry.builder()
                 .userId(userId)
@@ -73,9 +77,12 @@ public class VaultService {
                 .collect(Collectors.toList());
     }
 
-    public PasswordEntryResponse getEntry(Long userId, Long entryId, boolean decrypt) {
+    public PasswordEntryResponse getEntry(Long userId, Long entryId, boolean decrypt, String masterPassword) {
         PasswordEntry entry = passwordEntryRepository.findByIdAndUserId(entryId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Password entry not found"));
+        if (decrypt) {
+            validateMasterPassword(userId, masterPassword);
+        }
         return mapToResponse(entry, decrypt);
     }
 
@@ -101,7 +108,8 @@ public class VaultService {
     }
 
     @Transactional
-    public void deleteEntry(Long userId, Long entryId) {
+    public void deleteEntry(Long userId, Long entryId, String masterPassword) {
+        validateMasterPassword(userId, masterPassword);
         PasswordEntry entry = passwordEntryRepository.findByIdAndUserId(entryId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Password entry not found"));
         passwordEntryRepository.delete(entry);
@@ -142,11 +150,52 @@ public class VaultService {
         return passwordEntryRepository.countByUserId(userId);
     }
 
-    public List<PasswordEntryResponse> exportUserVault(Long userId) {
+    public List<PasswordEntryResponse> exportUserVault(Long userId, String masterPassword) {
+        validateMasterPassword(userId, masterPassword);
         return passwordEntryRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(entry -> mapToResponse(entry, true))
                 .collect(Collectors.toList());
+    }
+
+    public List<PasswordEntryResponse> getUserEntriesInternal(Long userId, String masterPassword) {
+        return exportUserVault(userId, masterPassword);
+    }
+
+    @Transactional
+    public long restoreUserVault(Long userId, List<PasswordEntryRequest> entries) {
+        if (entries == null) {
+            throw new BadRequestException("Restore entries are required");
+        }
+
+        passwordEntryRepository.deleteByUserId(userId);
+
+        for (PasswordEntryRequest request : entries) {
+            if (request == null) {
+                continue;
+            }
+
+            String title = request.getTitle() == null ? "" : request.getTitle().trim();
+            String password = request.getPassword() == null ? "" : request.getPassword().trim();
+            if (title.isEmpty() || password.isEmpty()) {
+                continue;
+            }
+
+            PasswordEntry entry = PasswordEntry.builder()
+                    .userId(userId)
+                    .title(title)
+                    .username(request.getUsername())
+                    .encryptedPassword(encryptionUtil.encrypt(password))
+                    .website(request.getWebsite())
+                    .category(request.getCategory())
+                    .notes(request.getNotes())
+                    .favorite(request.isFavorite())
+                    .build();
+
+            passwordEntryRepository.save(entry);
+        }
+
+        return passwordEntryRepository.countByUserId(userId);
     }
 
     private PasswordEntryResponse mapToResponse(PasswordEntry entry, boolean decrypt) {
@@ -162,5 +211,19 @@ public class VaultService {
                 .createdAt(entry.getCreatedAt())
                 .updatedAt(entry.getUpdatedAt())
                 .build();
+    }
+
+    private void validateMasterPassword(Long userId, String masterPassword) {
+        if (masterPassword == null || masterPassword.isBlank()) {
+            throw new BadRequestException("Master password is required");
+        }
+        Map<String, Boolean> response = authServiceClient.verifyMasterPassword(
+                userId,
+                Map.of("masterPassword", masterPassword)
+        );
+        Boolean valid = response == null ? null : response.get("valid");
+        if (valid == null || !valid) {
+            throw new BadRequestException("Invalid master password");
+        }
     }
 }

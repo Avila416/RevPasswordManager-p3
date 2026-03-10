@@ -32,4 +32,6 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
     long countByUserId(Long userId);
 
     void deleteByIdAndUserId(Long id, Long userId);
+
+    void deleteByUserId(Long userId);
 }

@@ -37,8 +37,9 @@ public class VaultController {
     public ResponseEntity<PasswordEntryResponse> getEntry(
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long id,
-            @RequestParam(defaultValue = "false") boolean decrypt) {
-        return ResponseEntity.ok(vaultService.getEntry(userId, id, decrypt));
+            @RequestParam(defaultValue = "false") boolean decrypt,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return ResponseEntity.ok(vaultService.getEntry(userId, id, decrypt, masterPassword));
     }
 
     @PutMapping("/{id}")
@@ -52,8 +53,9 @@ public class VaultController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteEntry(
             @RequestHeader("X-User-Id") Long userId,
-            @PathVariable Long id) {
-        vaultService.deleteEntry(userId, id);
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        vaultService.deleteEntry(userId, id, masterPassword);
         return ResponseEntity.ok(Map.of("message", "Password entry deleted successfully"));
     }
 
@@ -90,8 +92,33 @@ public class VaultController {
         return ResponseEntity.ok(Map.of("count", vaultService.getPasswordCount(userId)));
     }
 
+    @GetMapping("/count/user/{userId}")
+    public ResponseEntity<Long> getPasswordCountByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(vaultService.getPasswordCount(userId));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PasswordEntryResponse>> getUserVault(
+            @PathVariable Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return ResponseEntity.ok(vaultService.getUserEntriesInternal(userId, masterPassword));
+    }
+
+    @PostMapping("/user/{userId}/restore")
+    public ResponseEntity<Map<String, Object>> restoreUserVault(
+            @PathVariable Long userId,
+            @RequestBody List<PasswordEntryRequest> entries) {
+        long restoredCount = vaultService.restoreUserVault(userId, entries);
+        return ResponseEntity.ok(Map.of(
+                "message", "Vault restored successfully",
+                "restoredCount", restoredCount
+        ));
+    }
+
     @GetMapping("/user/{userId}/export")
-    public ResponseEntity<List<PasswordEntryResponse>> exportUserVault(@PathVariable Long userId) {
-        return ResponseEntity.ok(vaultService.exportUserVault(userId));
+    public ResponseEntity<List<PasswordEntryResponse>> exportUserVault(
+            @PathVariable Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return ResponseEntity.ok(vaultService.exportUserVault(userId, masterPassword));
     }
 }

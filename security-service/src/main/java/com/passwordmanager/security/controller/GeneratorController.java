@@ -29,8 +29,10 @@ public class GeneratorController {
     }
 
     @GetMapping("/audit")
-    public AuditResponse audit(@RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
-        return auditService.generateAudit(userId);
+    public AuditResponse audit(
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return auditService.generateAudit(userId, masterPassword);
     }
 
     @GetMapping("/audit/alerts")
@@ -40,8 +42,9 @@ public class GeneratorController {
 
     @GetMapping("/audit/passwords-analysis")
     public List<StoredPasswordAnalysisResponse> passwordAnalysis(
-            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
-        return auditService.analyzeStoredPasswords(userId);
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return auditService.analyzeStoredPasswords(userId, masterPassword);
     }
 
     @DeleteMapping("/audit/history")

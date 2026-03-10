@@ -149,6 +149,12 @@ public class AuthService {
         return user.getMasterPassword() != null && user.getMasterPassword().equals(masterPassword);
     }
 
+    public boolean verifyMasterPasswordByUserId(Long userId, String masterPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return user.getMasterPassword() != null && user.getMasterPassword().equals(masterPassword);
+    }
+
     @Transactional
     public void requestTwoFactorCode(String email) {
         User user = userRepository.findByEmail(email)
@@ -191,6 +197,127 @@ public class AuthService {
                 .tokenType("Bearer")
                 .user(mapToUserDto(user))
                 .build();
+    }
+
+    @Transactional
+    public void requestPasswordResetCode(String email) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        String code = generateOtp();
+
+        verificationCodeRepository.deleteByEmailAndCodeType(email, VerificationCode.CodeType.PASSWORD_RESET);
+
+        VerificationCode verificationCode = VerificationCode.builder()
+                .email(email)
+                .code(code)
+                .expiryTime(LocalDateTime.now().plusMinutes(10))
+                .codeType(VerificationCode.CodeType.PASSWORD_RESET)
+                .build();
+
+        verificationCodeRepository.save(verificationCode);
+        log.info("Password reset code generated for: {} - Code: {}", user.getEmail(), code);
+    }
+
+    @Transactional
+    public void resetForgotPassword(String email, String code, String newPassword, String confirmPassword) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required");
+        }
+        if (code == null || code.isBlank()) {
+            throw new BadRequestException("Verification code is required");
+        }
+        if (newPassword == null || newPassword.isBlank() || confirmPassword == null || confirmPassword.isBlank()) {
+            throw new BadRequestException("New password and confirm password are required");
+        }
+        if (newPassword.length() < 6) {
+            throw new BadRequestException("New password must be at least 6 characters");
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            throw new BadRequestException("New password and confirm password must match");
+        }
+
+        VerificationCode verificationCode = verificationCodeRepository
+                .findByEmailAndCodeAndCodeType(email, code, VerificationCode.CodeType.PASSWORD_RESET)
+                .orElseThrow(() -> new UnauthorizedException("Invalid verification code"));
+
+        if (verificationCode.isExpired()) {
+            throw new UnauthorizedException("Verification code has expired");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        verificationCodeRepository.delete(verificationCode);
+
+        log.info("Password reset successful for user: {}", user.getUsername());
+    }
+
+    @Transactional
+    public void requestMasterPasswordResetCode(String email) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        String code = generateOtp();
+
+        verificationCodeRepository.deleteByEmailAndCodeType(email, VerificationCode.CodeType.MASTER_PASSWORD_RESET);
+
+        VerificationCode verificationCode = VerificationCode.builder()
+                .email(email)
+                .code(code)
+                .expiryTime(LocalDateTime.now().plusMinutes(10))
+                .codeType(VerificationCode.CodeType.MASTER_PASSWORD_RESET)
+                .build();
+
+        verificationCodeRepository.save(verificationCode);
+        log.info("Master password reset code generated for: {} - Code: {}", user.getEmail(), code);
+    }
+
+    @Transactional
+    public void resetForgotMasterPassword(String email, String code, String newMasterPassword, String confirmMasterPassword) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required");
+        }
+        if (code == null || code.isBlank()) {
+            throw new BadRequestException("Verification code is required");
+        }
+        if (newMasterPassword == null || newMasterPassword.isBlank()
+                || confirmMasterPassword == null || confirmMasterPassword.isBlank()) {
+            throw new BadRequestException("New master password and confirm master password are required");
+        }
+        if (newMasterPassword.length() < 6) {
+            throw new BadRequestException("New master password must be at least 6 characters");
+        }
+        if (!newMasterPassword.equals(confirmMasterPassword)) {
+            throw new BadRequestException("New master password and confirm master password must match");
+        }
+
+        VerificationCode verificationCode = verificationCodeRepository
+                .findByEmailAndCodeAndCodeType(email, code, VerificationCode.CodeType.MASTER_PASSWORD_RESET)
+                .orElseThrow(() -> new UnauthorizedException("Invalid verification code"));
+
+        if (verificationCode.isExpired()) {
+            throw new UnauthorizedException("Verification code has expired");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setMasterPassword(newMasterPassword);
+        userRepository.save(user);
+        verificationCodeRepository.delete(verificationCode);
+
+        log.info("Master password reset successful for user: {}", user.getUsername());
     }
 
     @Transactional

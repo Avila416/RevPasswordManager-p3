@@ -1,0 +1,198 @@
+<main class="page">
+  <header class="hero">
+    <h1>Backup Operations</h1>
+    <p>Manage backup lifecycle with live vault entries and audit visibility in one place.</p>
+    <button class="btn" (click)="refreshAll()">Refresh</button>
+    <p class="hero-refresh-time" *ngIf="lastRefreshedAt">Last refreshed: {{ lastRefreshedAt }}</p>
+  </header>
+
+  <section class="alerts" *ngIf="message || error">
+    <p class="ok" *ngIf="message">{{ message }}</p>
+    <p class="fail" *ngIf="error">{{ error }}</p>
+  </section>
+
+  <section class="grid metrics" *ngIf="dashboard">
+    <article class="card metric">
+      <h2>Total Passwords</h2>
+      <p>{{ dashboard.totalPasswords }}</p>
+    </article>
+    <article class="card metric">
+      <h2>Weak Passwords</h2>
+      <p>{{ dashboard.weakPasswords }}</p>
+    </article>
+    <article class="card metric">
+      <h2>Recent Passwords</h2>
+      <p>{{ dashboard.recentPasswords }}</p>
+    </article>
+    <article class="card metric wide">
+      <h2>Action Stats</h2>
+      <div class="chips" *ngIf="dashboard.actionStats">
+        <span class="chip" *ngFor="let stat of dashboard.actionStats | keyvalue">
+          {{ stat.key }}: {{ stat.value }}
+        </span>
+      </div>
+    </article>
+  </section>
+
+  <section id="vault" class="card">
+    <h2>Vault Entries (Auto Synced)</h2>
+    <p class="help">This table automatically reflects entries from the Vault module.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Username</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entry of entries">
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.title }}</td>
+            <td>{{ entry.username }}</td>
+            <td>{{ entry.createdAt | date: 'medium' }}</td>
+            <td class="inline-actions">
+              <button class="btn small" (click)="viewEntry(entry)">
+                {{ revealedPasswords[entry.id] ? 'Hide Password' : 'View Password' }}
+              </button>
+              <button class="btn danger small" (click)="deleteEntry(entry.id)">Delete</button>
+              <span class="inline-password" *ngIf="revealedPasswords[entry.id]">
+                {{ revealedPasswords[entry.id] }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="entries.length === 0">
+            <td colspan="5">No vault entries found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid two-col">
+    <article id="backup" class="card">
+      <h2>Backup Operations</h2>
+      <p class="help">
+        Steps: 1) Click <strong>Export</strong> to generate backup (required before deleting any vault entry).
+        2) Click <strong>Validate</strong> to verify backup integrity and restore vault entries.
+        3) Click <strong>Update</strong> to overwrite latest backup and restore vault entries.
+        4) Click <strong>Restore</strong> to recover vault data from backup content.
+        5) Click <strong>Delete</strong> to remove the latest backup file.
+        <br/><em>Note: Master password is required to export backups and to view or delete vault entries.</em>
+      </p>
+      <div class="inline-actions">
+        <input
+          type="password"
+          [(ngModel)]="backupMasterPassword"
+          placeholder="Master password for export"
+          name="backupExportMasterPassword"
+        />
+      </div>
+      <div class="inline-actions">
+        <button class="btn" (click)="exportBackup()" [disabled]="loading">Export</button>
+        <button class="btn" (click)="validateBackup()" [disabled]="!backupContent.trim()">Validate</button>
+        <button class="btn" (click)="updateBackup()" [disabled]="!backupContent.trim()">Update</button>
+        <button class="btn" (click)="restoreBackup()" [disabled]="!backupContent.trim()">Restore</button>
+        <button class="btn ghost" (click)="toggleBackupContent()">
+          {{ showBackupContent ? 'Hide Backup Content' : 'Show Backup Content' }}
+        </button>
+        <button class="btn ghost" (click)="toggleTechnicalDetails()">
+          {{ showTechnicalDetails ? 'Hide Technical Details' : 'Show Technical Details' }}
+        </button>
+        <button class="btn danger" (click)="deleteBackup()">Delete</button>
+      </div>
+      <p class="help" *ngIf="!showBackupContent">
+        Backup content is hidden by default. Use <strong>Show Backup Content</strong> only for manual restore/update flows.
+      </p>
+      <label *ngIf="showBackupContent">
+        Backup Content
+        <textarea [(ngModel)]="backupContent" name="backupContent" rows="7"
+          placeholder="Paste backup payload here, then Validate/Update/Restore"></textarea>
+      </label>
+      <div class="muted" *ngIf="showTechnicalDetails && backupValidationResult">
+        <p><strong>Validation:</strong> {{ backupValidationResult.message }}</p>
+        <p>Checksum: <code>{{ backupValidationResult.checksum }}</code></p>
+        <p>Encrypted length: {{ backupValidationResult.encryptedLength }} chars</p>
+        <p>Payload length: {{ backupValidationResult.payloadLength }} chars</p>
+        <p>Validated at: {{ backupValidationResult.validatedAt | date: 'medium' }}</p>
+      </div>
+      <div class="muted" *ngIf="showTechnicalDetails && backupUpdateResult">
+        <p><strong>Update:</strong> {{ backupUpdateResult.message }}</p>
+        <p>File: <strong>{{ backupUpdateResult.fileName }}</strong></p>
+        <p>Checksum: <code>{{ backupUpdateResult.checksum }}</code></p>
+        <p>Payload length: {{ backupUpdateResult.payloadLength }} chars</p>
+        <p>Updated at: {{ backupUpdateResult.updatedAt | date: 'medium' }}</p>
+      </div>
+      <div class="muted" *ngIf="showTechnicalDetails && latestBackupInfo">
+        <p *ngIf="latestBackupInfo.exists">
+          Latest backup file: <strong>{{ latestBackupInfo.fileName }}</strong><br />
+          Path: <code>{{ latestBackupInfo.filePath }}</code>
+        </p>
+        <p *ngIf="!latestBackupInfo.exists">
+          Latest backup file path is not available yet. Export once to create it.
+        </p>
+      </div>
+      <p class="help" *ngIf="!showTechnicalDetails">
+        Technical details (checksum, payload length, file path) are hidden by default.
+      </p>
+    </article>
+
+    <article id="audit" class="card">
+      <h2>Audit Logs</h2>
+      <div class="inline-actions filter-row">
+        <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="auditFilter.action" name="actionFilter" />
+        <input type="text" placeholder="Status (e.g., fail)" [(ngModel)]="auditFilter.status" name="statusFilter" />
+        <input type="text" placeholder="IP (optional)" [(ngModel)]="auditFilter.ip" name="ipFilter" />
+        <button class="btn small" (click)="fetchAuditLogs()">Apply</button>
+        <button class="btn ghost small" (click)="clearAuditFilters()">Clear</button>
+      </div>
+      <div class="table-wrap slim">
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Status</th>
+              <th>IP</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of auditLogs">
+              <td>{{ log.action }}</td>
+              <td>{{ log.status }}</td>
+              <td>{{ log.ip }}</td>
+              <td>{{ log.time | date: 'medium' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section class="modal" *ngIf="selectedEntry && masterAction">
+    <div class="modal-content">
+      <h3>{{ masterAction === 'view' ? 'Verify Master Password' : 'Security Verification' }}</h3>
+      <p>
+        {{ masterAction === 'view' ? 'Enter master password to reveal this entry.' : 'Enter master password to delete this entry.' }}
+      </p>
+      <p *ngIf="masterAction === 'delete'" class="hint"><em>Note: A valid backup must exist before deletion. Export first if needed.</em></p>
+      <p><strong>Entry:</strong> {{ selectedEntry.title || '(No title)' }}</p>
+      <input
+        type="password"
+        [(ngModel)]="masterPasswordInput"
+        placeholder="Master password"
+        name="backupOpsMasterPassword"
+      />
+      <div class="inline-actions">
+        <button class="btn ghost" type="button" (click)="closeMasterPasswordModal()">Cancel</button>
+        <button class="btn" type="button" (click)="submitMasterPasswordAction()" [disabled]="processingMasterAction">
+          {{ processingMasterAction ? 'Processing...' : 'Submit' }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>

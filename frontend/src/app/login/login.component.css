@@ -1,0 +1,97 @@
+.card {
+  background: #ffffff;
+  border: 1px solid #c4d5ff;
+  border-top: 6px solid #2a4aa2;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(38, 78, 160, 0.12);
+  padding: 22px;
+  display: grid;
+  gap: 10px;
+  max-width: 540px;
+  margin: 8px auto 0;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  color: #18366f;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #18366f;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #b7caf9;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f9fbff;
+}
+
+input:focus {
+  outline: none;
+  border-color: #2a4aa2;
+  box-shadow: 0 0 0 3px rgba(42, 74, 162, 0.12);
+}
+
+button {
+  width: 100%;
+  border: 1px solid #2a4aa2;
+  background: #2a4aa2;
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #223f8a;
+}
+
+.secondary {
+  border-color: #607089;
+  background: #607089;
+}
+
+.secondary:hover {
+  background: #4e5e76;
+}
+
+.actions {
+  margin-top: 4px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+a {
+  color: #214ea8;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.err { color: #a12727; }
+.ok { color: #186a30; }
+
+@media (max-width: 560px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

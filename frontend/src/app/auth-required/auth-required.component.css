@@ -1,0 +1,19 @@
+﻿.notice {
+  max-width: 620px;
+  margin: 40px auto;
+  background: #fff;
+  border: 1px solid #d7dfda;
+  border-radius: 12px;
+  padding: 18px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notice a {
+  display: inline-block;
+  margin-top: 8px;
+  text-decoration: none;
+  border: 1px solid #bdd0cb;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: #21463d;
+}

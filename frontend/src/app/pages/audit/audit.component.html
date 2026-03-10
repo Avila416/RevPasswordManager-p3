@@ -1,0 +1,77 @@
+<section class="page">
+  <header class="header">
+    <h2>Security Audit Report</h2>
+    <input
+      type="password"
+      [(ngModel)]="masterPasswordInput"
+      placeholder="Master password"
+      name="auditMasterPassword"
+    />
+    <button type="button" (click)="refreshAll()" [disabled]="loading">
+      {{ loading ? 'Running...' : 'Run Audit Again' }}
+    </button>
+  </header>
+
+  <p class="banner" *ngIf="alertBanner">{{ alertBanner }}</p>
+
+  <section class="cards" *ngIf="audit as report">
+    <article class="card">
+      <h4>Total Passwords</h4>
+      <div class="value">{{ report.total }}</div>
+    </article>
+    <article class="card">
+      <h4>Weak</h4>
+      <div class="value risk">{{ report.weak }}</div>
+    </article>
+    <article class="card">
+      <h4>Reused</h4>
+      <div class="value risk">{{ report.reused }}</div>
+    </article>
+    <article class="card">
+      <h4>Old</h4>
+      <div class="value risk">{{ report.old }}</div>
+    </article>
+  </section>
+
+  <section class="panel">
+    <h3>Password Strength Analysis</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Created At</th>
+            <th>Username</th>
+            <th>Website</th>
+            <th>Strength</th>
+            <th>Risks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of analysis">
+            <td>{{ row.createdAt | date:'short' }}</td>
+            <td>{{ row.username || '-' }}</td>
+            <td>{{ row.website || '-' }}</td>
+            <td>{{ row.strength }}</td>
+            <td>
+              <span class="tag" *ngFor="let tag of riskTags(row)">{{ tag }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>Security Alerts</h3>
+    <p *ngIf="alerts.length === 0">No alerts recorded yet.</p>
+
+    <ul class="alerts" *ngIf="alerts.length > 0">
+      <li *ngFor="let alert of alerts">
+        <span class="severity" [class.high]="alert.severity === 'HIGH'" [class.medium]="alert.severity === 'MEDIUM'">
+          {{ alert.severity }}
+        </span>
+        <span>{{ alert.message }}</span>
+      </li>
+    </ul>
+  </section>
+</section>

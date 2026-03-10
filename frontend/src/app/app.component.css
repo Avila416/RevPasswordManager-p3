@@ -1,0 +1,85 @@
+:host {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  background: #e8edf3;
+}
+
+.sidebar {
+  background: #163c70;
+  color: #fff;
+  padding: 24px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar h1 {
+  margin: 0 0 16px;
+  font-size: 1.9rem;
+}
+
+.nav-links {
+  display: grid;
+  gap: 10px;
+}
+
+.sidebar a,
+.sidebar button {
+  display: block;
+  text-decoration: none;
+  color: #d7e6fb;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+
+.sidebar a:hover,
+.sidebar a.active,
+.sidebar button:hover {
+  background: #2f67a8;
+  color: #fff;
+}
+
+.content {
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .nav-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav-links {
+    grid-template-columns: 1fr;
+  }
+}

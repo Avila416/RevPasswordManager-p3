@@ -1,5 +1,7 @@
 package com.passwordmanager.security.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import java.time.LocalDateTime;
 
 public class PasswordEntryDto {
@@ -7,6 +9,7 @@ public class PasswordEntryDto {
     private Long id;
     private String username;
     private String website;
+    @JsonAlias({"password", "encryptedPassword"})
     private String encryptedPassword;
     private LocalDateTime createdAt;
     private Boolean favorite;

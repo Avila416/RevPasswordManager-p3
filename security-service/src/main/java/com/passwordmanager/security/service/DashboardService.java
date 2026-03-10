@@ -27,8 +27,11 @@ public class DashboardService {
     }
 
     @CircuitBreaker(name = "vaultService", fallbackMethod = "getDashboardFallback")
-    public DashboardResponse getDashboard(Long userId) {
-        List<PasswordEntryDto> passwords = vaultServiceClient.getUserPasswords(userId);
+    public DashboardResponse getDashboard(Long userId, String masterPassword) {
+        if (masterPassword == null || masterPassword.isBlank()) {
+            return new DashboardResponse(0, 0, 0, Collections.emptyMap());
+        }
+        List<PasswordEntryDto> passwords = vaultServiceClient.getUserPasswords(userId, masterPassword);
 
         long totalPasswords = passwords.size();
         long recentPasswords = passwords.stream()
@@ -41,7 +44,7 @@ public class DashboardService {
         return new DashboardResponse(totalPasswords, weakPasswords, recentPasswords, Collections.emptyMap());
     }
 
-    public DashboardResponse getDashboardFallback(Long userId, Throwable throwable) {
+    public DashboardResponse getDashboardFallback(Long userId, String masterPassword, Throwable throwable) {
         log.warn("Fallback triggered for getDashboard. User: {}, Error: {}", userId, throwable.getMessage());
         return new DashboardResponse(0, 0, 0, Collections.emptyMap());
     }

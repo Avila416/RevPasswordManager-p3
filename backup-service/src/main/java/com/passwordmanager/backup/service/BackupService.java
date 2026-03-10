@@ -10,6 +10,7 @@ import com.passwordmanager.backup.repository.BackupFileRepository;
 import com.passwordmanager.backup.util.AuditActions;
 import com.passwordmanager.backup.util.EncryptionUtil;
 import com.passwordmanager.backup.util.FileUtil;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,12 @@ public class BackupService {
     }
 
     @CircuitBreaker(name = "vaultService", fallbackMethod = "exportBackupFallback")
-    public String exportBackup(Long userId) {
-        List<PasswordEntryDto> entries = vaultServiceClient.exportUserVault(userId);
+    public String exportBackup(Long userId, String masterPassword) {
+        if (masterPassword == null || masterPassword.isBlank()) {
+            auditLogService.log(AuditActions.BACKUP_EXPORT, "127.0.0.1", "FAILED", userId);
+            throw new BackupException("Master password is required");
+        }
+        List<PasswordEntryDto> entries = vaultServiceClient.exportUserVault(userId, masterPassword);
         String vaultSnapshot = serializeVaultSnapshot(entries);
         String encrypted = encryptionUtil.encrypt(vaultSnapshot);
         String checksum = sha256(encrypted);
@@ -72,7 +77,14 @@ public class BackupService {
         return payload;
     }
 
-    public String exportBackupFallback(Long userId, Throwable throwable) {
+    public String exportBackupFallback(Long userId, String masterPassword, Throwable throwable) {
+        if (throwable instanceof FeignException feign) {
+            String body = feign.contentUTF8();
+            if (feign.status() == 400 && body != null && !body.isBlank()) {
+                auditLogService.log(AuditActions.BACKUP_EXPORT, "127.0.0.1", "FAILED", userId);
+                throw new BackupException(extractMessage(body));
+            }
+        }
         log.warn("Fallback triggered for exportBackup. User: {}, Error: {}", userId, throwable.getMessage());
         auditLogService.log(AuditActions.BACKUP_EXPORT, "127.0.0.1", "FAILED", userId);
         throw new BackupException("Unable to export backup - vault service unavailable");
@@ -95,12 +107,15 @@ public class BackupService {
 
         // Parse and validate entries
         List<PasswordEntryDto> entries = parseVaultSnapshot(decrypted);
+        Map<String, Object> restoreResult = vaultServiceClient.restoreUserVault(userId, entries);
+        Object restoredCount = restoreResult.get("restoredCount");
+        long restoredEntries = restoredCount instanceof Number ? ((Number) restoredCount).longValue() : entries.size();
 
         auditLogService.log(AuditActions.BACKUP_RESTORE, "127.0.0.1", "SUCCESS", userId);
         return Map.of(
-                "message", "Backup validated successfully. Ready for restore.",
-                "entryCount", entries.size(),
-                "validatedAt", LocalDateTime.now().toString()
+                "message", "Backup restored successfully",
+                "restoredEntries", restoredEntries,
+                "restoredAt", LocalDateTime.now().toString()
         );
     }
 
@@ -238,6 +253,21 @@ public class BackupService {
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
             throw new BackupException("Unable to compute backup checksum");
+        }
+    }
+
+    private String extractMessage(String payload) {
+        if (payload == null || payload.isBlank()) {
+            return "Invalid request";
+        }
+        String trimmed = payload.trim();
+        if (!trimmed.startsWith("{")) {
+            return trimmed;
+        }
+        try {
+            return objectMapper.readTree(trimmed).path("message").asText(trimmed);
+        } catch (Exception ex) {
+            return trimmed;
         }
     }
 }

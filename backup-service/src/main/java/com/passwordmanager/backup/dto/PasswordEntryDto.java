@@ -1,5 +1,8 @@
 package com.passwordmanager.backup.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 public class PasswordEntryDto {
@@ -8,6 +11,8 @@ public class PasswordEntryDto {
     private String username;
     private String website;
     private String title;
+    @JsonAlias({"password", "encryptedPassword"})
+    @JsonProperty("password")
     private String encryptedPassword;
     private String category;
     private LocalDateTime createdAt;

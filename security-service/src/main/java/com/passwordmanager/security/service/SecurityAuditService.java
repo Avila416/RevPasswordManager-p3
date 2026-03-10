@@ -34,8 +34,8 @@ public class SecurityAuditService {
     }
 
     @CircuitBreaker(name = "vaultService", fallbackMethod = "generateAuditFallback")
-    public AuditResponse generateAudit(Long userId) {
-        List<PasswordEntryDto> list = vaultServiceClient.getUserPasswords(userId);
+    public AuditResponse generateAudit(Long userId, String masterPassword) {
+        List<PasswordEntryDto> list = vaultServiceClient.getUserPasswords(userId, masterPassword);
 
         if (list == null || list.isEmpty()) {
             LocalDateTime generatedAt = LocalDateTime.now();
@@ -129,7 +129,7 @@ public class SecurityAuditService {
                 .build();
     }
 
-    public AuditResponse generateAuditFallback(Long userId, Throwable throwable) {
+    public AuditResponse generateAuditFallback(Long userId, String masterPassword, Throwable throwable) {
         log.warn("Fallback triggered for generateAudit. User: {}, Error: {}", userId, throwable.getMessage());
         return AuditResponse.builder()
                 .total(0)
@@ -150,8 +150,8 @@ public class SecurityAuditService {
     }
 
     @CircuitBreaker(name = "vaultService", fallbackMethod = "analyzeStoredPasswordsFallback")
-    public List<StoredPasswordAnalysisResponse> analyzeStoredPasswords(Long userId) {
-        List<PasswordEntryDto> list = vaultServiceClient.getUserPasswords(userId);
+    public List<StoredPasswordAnalysisResponse> analyzeStoredPasswords(Long userId, String masterPassword) {
+        List<PasswordEntryDto> list = vaultServiceClient.getUserPasswords(userId, masterPassword);
         Map<String, Integer> useMap = new HashMap<>();
 
         for (PasswordEntryDto entry : list) {
@@ -166,7 +166,7 @@ public class SecurityAuditService {
                 .toList();
     }
 
-    public List<StoredPasswordAnalysisResponse> analyzeStoredPasswordsFallback(Long userId, Throwable throwable) {
+    public List<StoredPasswordAnalysisResponse> analyzeStoredPasswordsFallback(Long userId, String masterPassword, Throwable throwable) {
         log.warn("Fallback triggered for analyzeStoredPasswords. User: {}, Error: {}", userId, throwable.getMessage());
         return Collections.emptyList();
     }

@@ -1,0 +1,38 @@
+<section class="card">
+  <h2>Login</h2>
+
+  <label>
+    Email
+    <input type="email" [(ngModel)]="form.email" name="email" required maxlength="255" />
+  </label>
+
+  <label>
+    Password
+    <input type="password" [(ngModel)]="form.password" name="password" required minlength="6" maxlength="128" />
+  </label>
+
+  <label>
+    OTP (if 2FA enabled)
+    <input
+      [(ngModel)]="form.otp"
+      name="otp"
+      inputmode="numeric"
+      maxlength="6"
+      pattern="^[0-9]{6}$"
+      placeholder="6-digit code"
+    />
+  </label>
+
+  <div class="actions">
+    <button type="button" class="secondary" (click)="requestOtp()">Request OTP</button>
+    <button type="button" (click)="login()">Login</button>
+  </div>
+
+  <div class="links">
+    <a routerLink="/forgot-password">Forgot password?</a>
+    <a routerLink="/register">Create account</a>
+  </div>
+
+  <p class="ok" *ngIf="message">{{ message }}</p>
+  <p class="err" *ngIf="error">{{ error }}</p>
+</section>

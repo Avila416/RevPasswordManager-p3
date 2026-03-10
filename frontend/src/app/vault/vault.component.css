@@ -1,0 +1,181 @@
+﻿:host {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.page {
+  color: #10263f;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.panel {
+  background: #f2f4f6;
+  border: 1px solid #d5dde7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.entry-form,
+.search-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+input,
+select,
+button {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #c9d4e1;
+  font: inherit;
+}
+
+button {
+  border: none;
+  background: #2768b1;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1f5a9a;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+button.ghost {
+  background: #dce6f3;
+  color: #113154;
+}
+
+button.danger {
+  background: #c34545;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tabs button,
+.view-switch button {
+  background: #dce6f3;
+  color: #113154;
+}
+
+.tabs button.active,
+.view-switch button.active {
+  background: #2f67a8;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.card {
+  background: #f7f9fc;
+  border: 1px solid #d7e0ea;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.card h3 {
+  margin: 0 0 6px;
+}
+
+.card p {
+  margin: 4px 0;
+  color: #35506f;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.error {
+  color: #b32727;
+}
+
+.success {
+  color: #1d8a41;
+  font-weight: 700;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: grid;
+  place-items: center;
+  padding: 14px;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  width: min(430px, 100%);
+}
+
+.pin-row {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.pin-box {
+  width: 52px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.4rem;
+}
+
+.hint {
+  color: #6a7a82;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}

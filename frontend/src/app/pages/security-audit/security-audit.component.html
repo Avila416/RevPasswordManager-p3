@@ -1,0 +1,39 @@
+<main class="page">
+  <header class="hero">
+    <h1>Security Audit</h1>
+    <p>Review and filter sensitive operations.</p>
+  </header>
+
+  <section class="card filters">
+    <input type="text" placeholder="Action (e.g., delete)" [(ngModel)]="filter.action" />
+    <input type="text" placeholder="Status (e.g., success)" [(ngModel)]="filter.status" />
+    <input type="text" placeholder="IP (optional)" [(ngModel)]="filter.ip" />
+    <button class="btn" (click)="fetchLogs()">Apply</button>
+    <button class="btn ghost" (click)="clear()">Clear</button>
+  </section>
+
+  <section class="card" *ngIf="error">
+    <p class="fail">{{ error }}</p>
+  </section>
+
+  <section class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Status</th>
+          <th>IP</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs">
+          <td>{{ log.action }}</td>
+          <td>{{ log.status }}</td>
+          <td>{{ log.ip }}</td>
+          <td>{{ log.time | date: 'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>

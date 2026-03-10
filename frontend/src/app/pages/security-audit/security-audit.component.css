@@ -1,0 +1,64 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.hero {
+  background: linear-gradient(130deg, #0b4b4a, #1d6f8f);
+  border-radius: 16px;
+  color: #eefeff;
+  padding: 1.2rem;
+}
+
+.card {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #b7d8dd;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+input {
+  border: 1px solid #7ea3b0;
+  border-radius: 9px;
+  padding: 0.55rem 0.65rem;
+  min-width: 180px;
+}
+
+.btn {
+  background: #1b5fa3;
+  color: #fff;
+  border: 0;
+  border-radius: 9px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: #f3fbff;
+  color: #154e78;
+  border: 1px solid #154e78;
+}
+
+.fail {
+  color: #7b1414;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #d5e3e7;
+  padding: 0.65rem 0.35rem;
+}

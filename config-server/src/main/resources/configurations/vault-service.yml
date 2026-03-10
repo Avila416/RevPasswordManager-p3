@@ -25,6 +25,10 @@ spring:
 encryption:
   secret-key: VaultEncryptionSecretKey12345678
 
+eureka:
+  instance:
+    prefer-ip-address: true
+
 resilience4j:
   circuitbreaker:
     instances:

@@ -9,7 +9,6 @@ public class PasswordEntryRequest {
 
     private String username;
 
-    @NotBlank(message = "Password is required")
     private String password;
 
     private String website;

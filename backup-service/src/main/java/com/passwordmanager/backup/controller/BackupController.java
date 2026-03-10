@@ -21,8 +21,10 @@ public class BackupController {
     }
 
     @GetMapping("/export")
-    public String export(@RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
-        return service.exportBackup(userId);
+    public String export(
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return service.exportBackup(userId, masterPassword);
     }
 
     @PostMapping("/restore")

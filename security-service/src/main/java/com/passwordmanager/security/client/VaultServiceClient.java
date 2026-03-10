@@ -4,6 +4,7 @@ import com.passwordmanager.security.dto.PasswordEntryDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -11,7 +12,9 @@ import java.util.List;
 public interface VaultServiceClient {
 
     @GetMapping("/api/vault/user/{userId}")
-    List<PasswordEntryDto> getUserPasswords(@PathVariable("userId") Long userId);
+    List<PasswordEntryDto> getUserPasswords(
+            @PathVariable("userId") Long userId,
+            @RequestHeader("X-Master-Password") String masterPassword);
 
     @GetMapping("/api/vault/count/user/{userId}")
     long getPasswordCount(@PathVariable("userId") Long userId);

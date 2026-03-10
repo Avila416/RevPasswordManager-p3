@@ -1,0 +1,50 @@
+module.exports = {
+  "/api/auth": {
+    target: "http://localhost:8081",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/users": {
+    target: "http://localhost:8081",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/vault": {
+    target: "http://localhost:8082",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/generator": {
+    target: "http://localhost:8083",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/security": {
+    target: "http://localhost:8083",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/dashboard": {
+    target: "http://localhost:8083",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/backup": {
+    target: "http://localhost:8084",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  },
+  "/api/audit": {
+    target: "http://localhost:8084",
+    secure: false,
+    changeOrigin: true,
+    logLevel: "debug"
+  }
+};

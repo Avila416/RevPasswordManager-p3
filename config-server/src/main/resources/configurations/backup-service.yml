@@ -27,7 +27,7 @@ spring:
       max-request-size: 10MB
 
 backup:
-  encryption-key: BackupEncryptionSecretKey12345678
+  encryption-key: BackupEncryptionSecretKey1234567
   storage-path: ./backups/
 
 resilience4j:

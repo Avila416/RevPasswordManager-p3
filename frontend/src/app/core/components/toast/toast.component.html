@@ -1,0 +1,10 @@
+<div
+  class="toast"
+  *ngIf="notificationService.message$ | async as message"
+  [class.success]="message.type === 'success'"
+  [class.warning]="message.type === 'warning'"
+  [class.error]="message.type === 'error'"
+  [class.info]="message.type === 'info'"
+>
+  {{ message.text }}
+</div>

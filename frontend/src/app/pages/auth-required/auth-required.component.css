@@ -1,0 +1,45 @@
+.auth-required {
+  max-width: 760px;
+  margin: 3rem auto;
+  background: #fff;
+  border: 1px solid #c8d9e3;
+  border-radius: 14px;
+  padding: 1.2rem;
+  box-shadow: 0 12px 24px rgba(18, 49, 69, 0.08);
+}
+
+.auth-required h2 {
+  margin-top: 0;
+}
+
+.auth-required code {
+  background: #eaf4fb;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+}
+
+.auth-required a {
+  display: inline-block;
+  margin-top: 0.8rem;
+  text-decoration: none;
+  border: 1px solid #bfd0ee;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #1f487e;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  margin-top: 0.8rem;
+  border: 1px solid #bfd0ee;
+  background: #f4f8ff;
+  color: #1f487e;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}

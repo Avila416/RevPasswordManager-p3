@@ -1,0 +1,13 @@
+<section class="auth-required">
+  <h2>Authentication Required</h2>
+  <p>You need a token in this browser origin to access these pages.</p>
+  <ol>
+    <li>Use this app's login page, or click demo access below.</li>
+    <li>Token must exist in local storage as <code>pm_token</code> (or legacy token keys).</li>
+    <li>Then open <a routerLink="/generator">Generator</a> or <a routerLink="/vault">Vault</a>.</li>
+  </ol>
+  <div class="actions">
+    <button type="button" (click)="openLogin()">Open Login</button>
+    <button type="button" (click)="useDemoAccess()">Use Demo Access</button>
+  </div>
+</section>

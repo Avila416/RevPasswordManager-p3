@@ -5,6 +5,8 @@ import com.passwordmanager.auth.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -23,5 +25,13 @@ public class UserController {
     @GetMapping("/exists/{id}")
     public ResponseEntity<Boolean> userExists(@PathVariable Long id) {
         return ResponseEntity.ok(authService.userExists(id));
+    }
+
+    @PostMapping("/{id}/master-password/verify")
+    public ResponseEntity<Map<String, Boolean>> verifyMasterPassword(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+        boolean valid = authService.verifyMasterPasswordByUserId(id, request.get("masterPassword"));
+        return ResponseEntity.ok(Map.of("valid", valid));
     }
 }

@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class AuthServiceClientFallback implements AuthServiceClient {
 
@@ -24,5 +26,11 @@ public class AuthServiceClientFallback implements AuthServiceClient {
     public Boolean userExists(Long id) {
         log.warn("Fallback: Auth service unavailable, assuming user exists for id: {}", id);
         return true;
+    }
+
+    @Override
+    public Map<String, Boolean> verifyMasterPassword(Long id, Map<String, String> request) {
+        log.warn("Fallback: Auth service unavailable, denying master password verification for id: {}", id);
+        return Map.of("valid", false);
     }
 }

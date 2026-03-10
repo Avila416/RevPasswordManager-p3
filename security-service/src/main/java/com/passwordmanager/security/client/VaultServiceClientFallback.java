@@ -14,7 +14,7 @@ public class VaultServiceClientFallback implements VaultServiceClient {
     private static final Logger log = LoggerFactory.getLogger(VaultServiceClientFallback.class);
 
     @Override
-    public List<PasswordEntryDto> getUserPasswords(Long userId) {
+    public List<PasswordEntryDto> getUserPasswords(Long userId, String masterPassword) {
         log.warn("Fallback: Unable to get passwords for user {}", userId);
         return Collections.emptyList();
     }

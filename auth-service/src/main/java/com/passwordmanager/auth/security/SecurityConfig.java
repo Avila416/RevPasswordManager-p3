@@ -43,7 +43,9 @@ public class SecurityConfig {
                     "/api/auth/2fa/request",
                     "/api/auth/2fa/verify",
                     "/api/auth/password/forgot/**",
+                    "/api/auth/master-password/forgot/**",
                     "/api/users/exists/**",
+                    "/api/users/*/master-password/verify",
                     "/actuator/**",
                     "/h2-console/**"
                 ).permitAll()

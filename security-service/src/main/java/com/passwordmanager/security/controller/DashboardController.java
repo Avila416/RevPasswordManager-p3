@@ -17,7 +17,8 @@ public class DashboardController {
 
     @GetMapping
     public DashboardResponse dashboard(
-            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId) {
-        return service.getDashboard(userId);
+            @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long userId,
+            @RequestHeader(value = "X-Master-Password", required = false) String masterPassword) {
+        return service.getDashboard(userId, masterPassword);
     }
 }

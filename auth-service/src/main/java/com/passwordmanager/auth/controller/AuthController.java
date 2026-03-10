@@ -37,7 +37,8 @@ public class AuthController {
 
     @GetMapping("/account")
     public ResponseEntity<User> getAccount(Authentication authentication) {
-        User user = authService.getCurrentUser(authentication.getName());
+        String username = requireUsername(authentication);
+        User user = authService.getCurrentUser(username);
         user.setPassword(null);
         user.setMasterPassword(null);
         return ResponseEntity.ok(user);
@@ -47,7 +48,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> setupMasterPassword(
             Authentication authentication,
             @Valid @RequestBody MasterPasswordRequest request) {
-        authService.setupMasterPassword(authentication.getName(), request);
+        authService.setupMasterPassword(requireUsername(authentication), request);
         return ResponseEntity.ok(Map.of("message", "Master password set successfully"));
     }
 
@@ -55,7 +56,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> changeMasterPassword(
             Authentication authentication,
             @Valid @RequestBody MasterPasswordRequest request) {
-        authService.changeMasterPassword(authentication.getName(), request);
+        authService.changeMasterPassword(requireUsername(authentication), request);
         return ResponseEntity.ok(Map.of("message", "Master password changed successfully"));
     }
 
@@ -63,7 +64,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Boolean>> verifyMasterPassword(
             Authentication authentication,
             @RequestBody Map<String, String> request) {
-        boolean valid = authService.verifyMasterPassword(authentication.getName(), request.get("masterPassword"));
+        boolean valid = authService.verifyMasterPassword(requireUsername(authentication), request.get("masterPassword"));
         return ResponseEntity.ok(Map.of("valid", valid));
     }
 
@@ -78,11 +79,50 @@ public class AuthController {
         return ResponseEntity.ok(authService.verifyTwoFactorCode(request));
     }
 
+    @PostMapping("/password/forgot/request")
+    public ResponseEntity<Map<String, String>> requestForgotPasswordCode(@RequestBody Map<String, String> request) {
+        authService.requestPasswordResetCode(request.get("email"));
+        return ResponseEntity.ok(Map.of("message", "Password reset code sent"));
+    }
+
+    @PostMapping("/password/forgot/reset")
+    public ResponseEntity<Map<String, String>> resetForgotPassword(@RequestBody Map<String, String> request) {
+        authService.resetForgotPassword(
+                request.get("email"),
+                request.get("verificationCode"),
+                request.get("newPassword"),
+                request.get("confirmPassword"));
+        return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+    }
+
+    @PostMapping("/master-password/forgot/request")
+    public ResponseEntity<Map<String, String>> requestForgotMasterPasswordCode(@RequestBody Map<String, String> request) {
+        authService.requestMasterPasswordResetCode(request.get("email"));
+        return ResponseEntity.ok(Map.of("message", "Master password reset code sent"));
+    }
+
+    @PostMapping("/master-password/forgot/reset")
+    public ResponseEntity<Map<String, String>> resetForgotMasterPassword(@RequestBody Map<String, String> request) {
+        authService.resetForgotMasterPassword(
+                request.get("email"),
+                request.get("verificationCode"),
+                request.get("newMasterPassword"),
+                request.get("confirmMasterPassword"));
+        return ResponseEntity.ok(Map.of("message", "Master password reset successful"));
+    }
+
     @PutMapping("/2fa/status")
     public ResponseEntity<Map<String, String>> updateTwoFactorStatus(
             Authentication authentication,
             @RequestBody Map<String, Boolean> request) {
-        authService.updateTwoFactorStatus(authentication.getName(), request.get("enabled"));
+        authService.updateTwoFactorStatus(requireUsername(authentication), request.get("enabled"));
         return ResponseEntity.ok(Map.of("message", "Two-factor authentication status updated"));
+    }
+
+    private String requireUsername(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            throw new com.passwordmanager.auth.exception.UnauthorizedException("Authentication required");
+        }
+        return authentication.getName();
     }
 }

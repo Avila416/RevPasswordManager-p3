@@ -1,0 +1,41 @@
+<section class="card">
+  <h2>Create Account</h2>
+  <label>
+    Name
+    <input [(ngModel)]="form.name" name="name" required maxlength="120" />
+  </label>
+
+  <label>
+    Email
+    <input type="email" [(ngModel)]="form.email" name="email" required maxlength="255" />
+  </label>
+
+  <label>
+    Password
+    <input type="password" [(ngModel)]="form.password" name="password" required minlength="6" maxlength="128" />
+  </label>
+
+  <label>
+    Phone
+    <input
+      type="tel"
+      inputmode="numeric"
+      maxlength="10"
+      pattern="^[7-9][0-9]{9}$"
+      placeholder="10-digit number starting with 7, 8, or 9"
+      [(ngModel)]="form.phone"
+      name="phone"
+    />
+  </label>
+
+  <div class="actions">
+    <button type="button" (click)="register()">Register</button>
+  </div>
+
+  <div class="links">
+    <a routerLink="/login">Already have an account? Login</a>
+  </div>
+
+  <p class="ok" *ngIf="message">{{ message }}</p>
+  <p class="err" *ngIf="error">{{ error }}</p>
+</section>
