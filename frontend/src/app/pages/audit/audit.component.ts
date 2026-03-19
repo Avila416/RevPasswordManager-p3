@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { GeneratorApiService } from '../../core/services/generator-api.service';
-import { NotificationService } from '../../core/services/notification.service';
+import { GeneratorApiService } from '../../services/generator-api.service';
+import { NotificationService } from '../../services/notification.service';
 import { catchError, finalize, of } from 'rxjs';
 import {
   AlertResponse,
   AuditResponse,
   StoredPasswordAnalysisResponse
-} from '../../core/models/generator.models';
+} from '../../models/generator.models';
 
 @Component({
   selector: 'app-audit',

@@ -2,6 +2,7 @@ package com.passwordmanager.vault.controller;
 
 import com.passwordmanager.vault.dto.PasswordEntryRequest;
 import com.passwordmanager.vault.dto.PasswordEntryResponse;
+import com.passwordmanager.vault.dto.SearchRequest;
 import com.passwordmanager.vault.service.VaultService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -77,6 +78,17 @@ public class VaultController {
             @RequestHeader("X-User-Id") Long userId,
             @RequestParam String keyword) {
         return ResponseEntity.ok(vaultService.searchEntries(userId, keyword));
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<PasswordEntryResponse>> searchEntriesAdvanced(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestBody(required = false) SearchRequest request) {
+        String keyword = request == null ? null : request.getKeyword();
+        String category = request == null ? null : request.getCategory();
+        return ResponseEntity.ok(vaultService.searchEntries(userId, keyword, category, sortBy, direction));
     }
 
     @GetMapping("/by-domain")

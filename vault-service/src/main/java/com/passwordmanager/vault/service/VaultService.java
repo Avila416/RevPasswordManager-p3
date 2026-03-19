@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -139,6 +140,28 @@ public class VaultService {
                 .collect(Collectors.toList());
     }
 
+    public List<PasswordEntryResponse> searchEntries(Long userId,
+                                                     String keyword,
+                                                     String category,
+                                                     String sortBy,
+                                                     String direction) {
+        String normalizedKeyword = normalize(keyword);
+        String normalizedCategory = normalize(category);
+        boolean hasKeyword = !normalizedKeyword.isEmpty();
+        boolean hasCategory = !normalizedCategory.isEmpty();
+
+        Comparator<PasswordEntry> comparator = buildComparator(sortBy);
+        boolean descending = "desc".equalsIgnoreCase(direction);
+
+        return passwordEntryRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .filter(entry -> matchesKeyword(entry, normalizedKeyword, hasKeyword))
+                .filter(entry -> matchesCategory(entry, normalizedCategory, hasCategory))
+                .sorted(descending ? comparator.reversed() : comparator)
+                .map(entry -> mapToResponse(entry, false))
+                .collect(Collectors.toList());
+    }
+
     public List<PasswordEntryResponse> getByDomain(Long userId, String domain) {
         return passwordEntryRepository.findByDomain(userId, domain)
                 .stream()
@@ -211,6 +234,38 @@ public class VaultService {
                 .createdAt(entry.getCreatedAt())
                 .updatedAt(entry.getUpdatedAt())
                 .build();
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase();
+    }
+
+    private boolean matchesKeyword(PasswordEntry entry, String keyword, boolean hasKeyword) {
+        if (!hasKeyword) {
+            return true;
+        }
+        String title = normalize(entry.getTitle());
+        String website = normalize(entry.getWebsite());
+        String username = normalize(entry.getUsername());
+        return title.contains(keyword) || website.contains(keyword) || username.contains(keyword);
+    }
+
+    private boolean matchesCategory(PasswordEntry entry, String category, boolean hasCategory) {
+        if (!hasCategory) {
+            return true;
+        }
+        String entryCategory = normalize(entry.getCategory());
+        return entryCategory.equals(category);
+    }
+
+    private Comparator<PasswordEntry> buildComparator(String sortBy) {
+        if ("createdAt".equalsIgnoreCase(sortBy)) {
+            return Comparator.comparing(PasswordEntry::getCreatedAt,
+                    Comparator.nullsLast(Comparator.naturalOrder()));
+        }
+
+        return Comparator.comparing(entry -> normalize(entry.getTitle()),
+                Comparator.nullsLast(Comparator.naturalOrder()));
     }
 
     private void validateMasterPassword(Long userId, String masterPassword) {

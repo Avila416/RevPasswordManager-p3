@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { GeneratorApiService } from '../../core/services/generator-api.service';
-import { NotificationService } from '../../core/services/notification.service';
-import { PasswordResponse, SavePasswordRequest } from '../../core/models/generator.models';
+import { GeneratorApiService } from '../../services/generator-api.service';
+import { NotificationService } from '../../services/notification.service';
+import { PasswordResponse, SavePasswordRequest } from '../../models/generator.models';
 
 type GeneratorForm = FormGroup<{
   length: FormControl<number | null>;

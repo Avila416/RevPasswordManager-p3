@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { GeneratorComponent } from './pages/generator/generator.component';
 import { AuditComponent } from './pages/audit/audit.component';
 import { AuthRequiredComponent } from './pages/auth-required/auth-required.component';
-import { moduleAuthGuard } from './core/guards/module-auth.guard';
+import { moduleAuthGuard } from './guards/module-auth.guard';
 import { VaultComponent } from './vault/vault.component';
 import { vaultGuard } from './guards/vault.guard';
 import { RegisterComponent } from './register/register.component';

@@ -7,7 +7,7 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { NotificationService } from '../services/notification.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {

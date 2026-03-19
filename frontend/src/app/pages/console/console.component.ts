@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Component, OnInit } from '@angular/core';
 import { VaultEntry } from '../../models/vault.models';
 import { VaultApiService } from '../../services/vault-api.service';
-import { NotificationService } from '../../core/services/notification.service';
+import { NotificationService } from '../../services/notification.service';
 
 interface DashboardResponse {
   totalPasswords: number;
