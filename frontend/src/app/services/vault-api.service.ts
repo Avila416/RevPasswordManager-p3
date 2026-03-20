@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { SearchPayload, VaultEntry, VaultEntryPayload } from '../models/vault.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class VaultApiService {
-  private readonly baseUrl = '/api/vault';
+  private readonly baseUrl = `${environment.apiGatewayUrl}/api/vault`;
 
   constructor(private http: HttpClient) {}
 

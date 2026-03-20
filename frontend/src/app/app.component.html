@@ -15,6 +15,7 @@
       <a *ngIf="!authService.isAuthenticated()" routerLink="/forgot-password" routerLinkActive="active">Forgot Password</a>
 
       <button type="button" *ngIf="authService.isAuthenticated()" (click)="logout()">Logout</button>
+      
     </nav>
   </aside>
 

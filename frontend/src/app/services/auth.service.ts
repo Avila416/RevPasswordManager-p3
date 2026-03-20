@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface AuthResponse {
   token: string;
@@ -22,7 +23,7 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly baseUrl = '/api/auth';
+  private readonly baseUrl = `${environment.apiGatewayUrl}/api/auth`;
   private readonly tokenKey = 'pm_token';
   private readonly legacyTokenKey = 'token';
 

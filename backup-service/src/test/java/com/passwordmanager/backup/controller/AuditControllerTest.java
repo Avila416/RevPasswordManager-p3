@@ -63,7 +63,7 @@ class AuditControllerTest {
                 .andExpect(jsonPath("$.message").value("Status filter is too long"));
     }
 
-    @Test
+    @Test //
     void logActionDelegatesToService() throws Exception {
         mockMvc.perform(post("/api/audit/log")
                         .contentType(MediaType.APPLICATION_JSON)

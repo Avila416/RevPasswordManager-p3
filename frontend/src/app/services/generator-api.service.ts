@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
@@ -10,13 +10,14 @@ import {
   SavePasswordRequest,
   StoredPasswordAnalysisResponse
 } from '../models/generator.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeneratorApiService {
-  private readonly baseUrl = '/api/generator';
-  private readonly vaultUrl = '/api/vault';
+  private readonly baseUrl = `${environment.apiGatewayUrl}/api/generator`;
+  private readonly vaultUrl = `${environment.apiGatewayUrl}/api/vault`;
 
   constructor(private readonly http: HttpClient) {}
 

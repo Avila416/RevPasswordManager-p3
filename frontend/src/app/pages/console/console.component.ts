@@ -1,8 +1,9 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+﻿import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { VaultEntry } from '../../models/vault.models';
 import { VaultApiService } from '../../services/vault-api.service';
 import { NotificationService } from '../../services/notification.service';
+import { environment } from '../../../environments/environment';
 
 interface DashboardResponse {
   totalPasswords: number;
@@ -54,7 +55,7 @@ interface BackupRestoreResponse {
   styleUrls: ['./console.component.css']
 })
 export class ConsoleComponent implements OnInit {
-  private readonly apiBaseUrl = '/api';
+  private readonly apiBaseUrl = `${environment.apiGatewayUrl}/api`;
 
   dashboard: DashboardResponse | null = null;
   entries: VaultEntry[] = [];

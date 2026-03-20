@@ -1,5 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+﻿import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 interface AuditLog {
   action: string;
@@ -21,6 +22,7 @@ export class SecurityAuditComponent implements OnInit {
     ip: ''
   };
   error = '';
+  private readonly apiBaseUrl = `${environment.apiGatewayUrl}/api`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -34,7 +36,7 @@ export class SecurityAuditComponent implements OnInit {
     if (this.filter.status.trim()) params = params.set('status', this.filter.status.trim());
     if (this.filter.ip.trim()) params = params.set('ip', this.filter.ip.trim());
 
-    this.http.get<AuditLog[]>('/api/audit', { params }).subscribe({
+    this.http.get<AuditLog[]>(`${this.apiBaseUrl}/audit`, { params }).subscribe({
       next: (data) => {
         this.logs = data;
         this.error = '';

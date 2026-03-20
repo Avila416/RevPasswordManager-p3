@@ -4,7 +4,7 @@ import { GeneratorApiService } from '../../services/generator-api.service';
 import { NotificationService } from '../../services/notification.service';
 import { PasswordResponse, SavePasswordRequest } from '../../models/generator.models';
 
-type GeneratorForm = FormGroup<{
+type GeneratorForm = FormGroup<{ // here we are
   length: FormControl<number | null>;
   count: FormControl<number | null>;
   uppercase: FormControl<boolean | null>;
@@ -14,7 +14,7 @@ type GeneratorForm = FormGroup<{
   excludeSimilar: FormControl<boolean | null>;
 }>;
 
-type SaveToVaultForm = FormGroup<{
+type SaveToVaultForm = FormGroup<{ 
   title: FormControl<string | null>;
   username: FormControl<string | null>;
   website: FormControl<string | null>;
@@ -40,7 +40,7 @@ export class GeneratorComponent {
     'OTHER'
   ];
 
-  readonly form: GeneratorForm;
+  readonly form: GeneratorForm; 
   readonly saveForm: SaveToVaultForm;
 
   constructor(
@@ -48,7 +48,7 @@ export class GeneratorComponent {
     private readonly api: GeneratorApiService,
     private readonly notifications: NotificationService
   ) {
-    this.form = this.fb.group({
+    this.form = this.fb.group({ 
       length: [null, [Validators.required, Validators.min(8), Validators.max(64)]],
       count: [null, [Validators.required, Validators.min(1), Validators.max(20)]],
       uppercase: [false],
